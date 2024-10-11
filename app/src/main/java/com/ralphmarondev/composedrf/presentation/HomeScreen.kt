@@ -2,11 +2,13 @@ package com.ralphmarondev.composedrf.presentation
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -40,13 +42,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ralphmarondev.composedrf.model.Person
+import com.ralphmarondev.composedrf.presentation.components.DeletePersonDialog
 import com.ralphmarondev.composedrf.presentation.components.NewPersonDialog
 import com.ralphmarondev.composedrf.presentation.components.UpdatePersonDialog
+import com.ralphmarondev.composedrf.presentation.components.ViewPersonDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,6 +76,9 @@ fun HomeScreen(
     }
     var showNewPersonDialog by remember { mutableStateOf(false) }
     var showUpdatePersonDialog by remember { mutableStateOf(false) }
+    var showDeletePersonDialog by remember { mutableStateOf(false) }
+    var showViewPersonDialog by remember { mutableStateOf(false) }
+
     val context = LocalContext.current
 
     Scaffold(
@@ -119,6 +127,21 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
+            item { Spacer(modifier = Modifier.height(8.dp)) }
+            item {
+                AnimatedVisibility(people.isEmpty()) {
+                    Text(
+                        text = "No Data Found.",
+                        fontFamily = FontFamily.Monospace,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.W500,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    )
+                }
+            }
             items(people.size) {
                 ElevatedCard(
                     modifier = Modifier
@@ -157,7 +180,16 @@ fun HomeScreen(
                                 .fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            IconButton(onClick = {}) {
+                            IconButton(
+                                onClick = {
+                                    personToUpdate = personToUpdate.copy(
+                                        id = people[it].id,
+                                        name = people[it].name,
+                                        age = people[it].age
+                                    )
+                                    showDeletePersonDialog = !showDeletePersonDialog
+                                }
+                            ) {
                                 Icon(
                                     imageVector = Icons.Outlined.Delete,
                                     contentDescription = "Delete",
@@ -183,7 +215,16 @@ fun HomeScreen(
 
                             Spacer(modifier = Modifier.weight(1f))
 
-                            IconButton(onClick = {}) {
+                            IconButton(
+                                onClick = {
+                                    personToUpdate = personToUpdate.copy(
+                                        id = people[it].id,
+                                        name = people[it].name,
+                                        age = people[it].age
+                                    )
+                                    showViewPersonDialog = !showViewPersonDialog
+                                }
+                            ) {
                                 Icon(
                                     imageVector = Icons.Outlined.Info,
                                     contentDescription = "View",
@@ -194,6 +235,7 @@ fun HomeScreen(
                     }
                 }
             }
+            item { Spacer(modifier = Modifier.height(180.dp)) }
         }
 
         if (showNewPersonDialog) {
@@ -234,6 +276,34 @@ fun HomeScreen(
                         }
                     )
                 }
+            )
+        }
+
+        if (showDeletePersonDialog) {
+            DeletePersonDialog(
+                onDismiss = { showDeletePersonDialog = !showDeletePersonDialog },
+                person = personToUpdate,
+                onDelete = { id ->
+                    viewModel.deletePerson(
+                        id = id,
+                        response = { isSuccess, msg ->
+                            if (isSuccess) {
+                                showDeletePersonDialog = !showDeletePersonDialog
+                                Toast.makeText(context, "Deleted successfully!", Toast.LENGTH_SHORT)
+                                    .show()
+                            } else {
+                                Toast.makeText(context, "Error: $msg", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    )
+                }
+            )
+        }
+
+        if (showViewPersonDialog) {
+            ViewPersonDialog(
+                onDismiss = { showViewPersonDialog = !showViewPersonDialog },
+                person = personToUpdate
             )
         }
     }

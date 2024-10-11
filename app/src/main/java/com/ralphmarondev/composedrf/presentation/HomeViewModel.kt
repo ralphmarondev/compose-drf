@@ -29,10 +29,11 @@ class HomeViewModel : ViewModel() {
             try {
                 val createdPerson = RetrofitInstance.api.createPerson(newPerson)
                 Log.d("POST", "SUCCESS: $createdPerson")
+                fetchPeople()
                 response(true, null)
             } catch (e: Exception) {
                 Log.d("POST", "ERROR: ${e.message}")
-                response(false, "${e.message}")
+                response(false, e.message)
             }
         }
     }
@@ -42,9 +43,24 @@ class HomeViewModel : ViewModel() {
             try {
                 RetrofitInstance.api.updatePerson(id, person)
                 Log.d("PUT", "SUCCESS: $id added successfully.")
+                fetchPeople()
                 response(true, null)
             } catch (e: Exception) {
                 Log.d("PUT", "ERROR: ${e.message}")
+                response(false, e.message)
+            }
+        }
+    }
+
+    fun deletePerson(id: Int, response: (Boolean, String?) -> Unit) {
+        viewModelScope.launch {
+            try {
+                RetrofitInstance.api.deletePerson(id)
+                Log.d("DELETE", "SUCCESS: $id deleted successfully.")
+                fetchPeople()
+                response(true, null)
+            } catch (e: Exception) {
+                Log.d("DELETE", "ERROR: ${e.message}")
                 response(false, e.message)
             }
         }
