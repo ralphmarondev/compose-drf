@@ -2,10 +2,13 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+#! IMPORTANT: PLEASE DON'T LOOK AT MY [SECRET_KEY] 😅😄
+# Make this hidden on your app, create an environment for your keys!
 SECRET_KEY = 'django-insecure-d**=jxfgpm*h(54)px0+-yc+majoqvo-di(ux855jfw^&fl)wy'
 
 DEBUG = True
 
+# Change this with your own ip address!
 ALLOWED_HOSTS = ['192.168.68.124', 'localhost']
 
 INSTALLED_APPS = [
