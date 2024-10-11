@@ -1,14 +1,17 @@
 package com.ralphmarondev.composedrf.presentation
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.LightMode
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -20,10 +23,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.ralphmarondev.composedrf.presentation.components.NewPersonDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,6 +46,8 @@ fun HomeScreen(
     }
 
     val people by viewModel.people.observeAsState(emptyList())
+    var showNewPersonDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -70,6 +80,14 @@ fun HomeScreen(
                     actionIconContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = { showNewPersonDialog = !showNewPersonDialog }) {
+                Icon(
+                    imageVector = Icons.Outlined.Add,
+                    contentDescription = "New Person"
+                )
+            }
         }
     ) { innerPadding ->
         LazyColumn(
@@ -84,6 +102,25 @@ fun HomeScreen(
                     modifier = Modifier.padding(16.dp)
                 )
             }
+        }
+
+        if (showNewPersonDialog) {
+            NewPersonDialog(
+                onDismiss = { showNewPersonDialog = !showNewPersonDialog },
+                onSave = { name, age ->
+                    viewModel.addPerson(
+                        name = name,
+                        age = age,
+                        response = { isSuccess, msg ->
+                            if (isSuccess) {
+                                showNewPersonDialog = !showNewPersonDialog
+                            } else {
+                                Toast.makeText(context, "Failed: $msg", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    )
+                }
+            )
         }
     }
 }

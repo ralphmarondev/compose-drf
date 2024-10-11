@@ -21,4 +21,19 @@ class HomeViewModel : ViewModel() {
             }
         }
     }
+
+    fun addPerson(name: String, age: Int, response: (Boolean, String?) -> Unit) {
+        val newPerson = Person(name = name, age = age)
+
+        viewModelScope.launch {
+            try {
+                val createdPerson = RetrofitInstance.api.createPerson(newPerson)
+                Log.d("POST", "SUCCESS: $createdPerson")
+                response(true, null)
+            } catch (e: Exception) {
+                Log.d("POST", "ERROR: ${e.message}")
+                response(false, "${e.message}")
+            }
+        }
+    }
 }
