@@ -4,6 +4,8 @@ import com.ralphmarondev.composedrf.model.Person
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
+import retrofit2.http.Path
 
 interface ApiService {
     @GET("api/persons/")
@@ -11,4 +13,10 @@ interface ApiService {
 
     @POST("api/persons/")
     suspend fun createPerson(@Body person: Person):Person
+
+    @PUT("api/persons/{id}/")
+    suspend fun updatePerson(
+        @Path("id") id:Int,
+        @Body person: Person
+    )
 }

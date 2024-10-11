@@ -36,4 +36,17 @@ class HomeViewModel : ViewModel() {
             }
         }
     }
+
+    fun updatePerson(id: Int, person: Person, response: (Boolean, String?) -> Unit) {
+        viewModelScope.launch {
+            try {
+                RetrofitInstance.api.updatePerson(id, person)
+                Log.d("PUT", "SUCCESS: $id added successfully.")
+                response(true, null)
+            } catch (e: Exception) {
+                Log.d("PUT", "ERROR: ${e.message}")
+                response(false, e.message)
+            }
+        }
+    }
 }
