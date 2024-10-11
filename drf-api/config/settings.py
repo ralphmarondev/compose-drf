@@ -6,7 +6,7 @@ SECRET_KEY = 'django-insecure-d**=jxfgpm*h(54)px0+-yc+majoqvo-di(ux855jfw^&fl)wy
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.68.124', 'localhost']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -53,7 +53,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postresql',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'compose_drf',
         'USER': 'postgres',
         'PASSWORD': 'postgres'
